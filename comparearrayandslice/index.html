@@ -6,7 +6,7 @@
         <meta name="robots" content="noodp" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
         <title>golang的struct比较 - wyvin&#39;s blog</title><meta name="Description" content="desc"><meta property="og:title" content="golang的struct比较" />
-<meta property="og:description" content="struct可以比较，但有一些条件需要注意 相同类型 必须是相同类型的struct 1 2 3 4 5 6 7 8 9 10 11 12 type A struct { Num int } type B struct { Num int } a := A{} b :=" />
+<meta property="og:description" content="golang中的struct可不可以比较呢" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://example.org/comparearrayandslice/" />
 <meta property="og:image" content="http://example.org/logo.png"/>
@@ -16,7 +16,7 @@
 <meta name="twitter:image" content="http://example.org/logo.png"/>
 
 <meta name="twitter:title" content="golang的struct比较"/>
-<meta name="twitter:description" content="struct可以比较，但有一些条件需要注意 相同类型 必须是相同类型的struct 1 2 3 4 5 6 7 8 9 10 11 12 type A struct { Num int } type B struct { Num int } a := A{} b :="/>
+<meta name="twitter:description" content="golang中的struct可不可以比较呢"/>
 <meta name="application-name" content="wyvin&#39;s bolg">
 <meta name="apple-mobile-web-app-title" content="wyvin&#39;s bolg"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -29,7 +29,7 @@
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "http:\/\/example.org\/comparearrayandslice\/"
-        },"genre": "posts","keywords": "golang, struct","wordcount":  536 ,
+        },"genre": "posts","keywords": "golang, struct","wordcount":  533 ,
         "url": "http:\/\/example.org\/comparearrayandslice\/","datePublished": "2021-01-13T14:55:05+08:00","dateModified": "2021-01-13T14:55:05+08:00","publisher": {
             "@type": "Organization",
             "name": ""},"author": {
@@ -106,7 +106,7 @@
             <div class="toc-content always-active" id="toc-content-auto"></div>
         </div><article class="page single"><h1 class="single-title animated flipInX">golang的struct比较</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>wyvin</a></span>&nbsp;<span class="post-category">included in <a href="/categories/golang/"><i class="far fa-folder fa-fw"></i>golang</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-01-13">2021-01-13</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;536 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-01-13">2021-01-13</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;533 words&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;2 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
@@ -183,7 +183,9 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>以上代码编译时会报错：<code>invalid operation: a == b (struct containing map[int]int cannot be compared)</code></p>
-<p>可以到源码里找到相应的代码</p>
+<br>
+<p>可以到源码里找到相应的代码
+<code>/cmd/compile/internal/gc/typecheck.go</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -209,35 +211,31 @@
 </span><span class="lnt">21
 </span><span class="lnt">22
 </span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">/cmd/compile/internal/gc/typecheck.go
+<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">func</span> <span class="nf">typecheck1</span><span class="p">()</span> <span class="c1">// 检查类型
+</span><span class="c1"></span>  <span class="kd">func</span> <span class="nf">IncomparableField</span><span class="p">()</span> <span class="c1">// 返回结构体不可比较的字段，如果有的话
+</span><span class="c1"></span>    <span class="kd">func</span> <span class="nf">IsComparable</span><span class="p">()</span>  <span class="c1">// 判断字段的类型是否可以比较
+</span><span class="c1"></span>      <span class="kd">func</span> <span class="nf">algtype1</span><span class="p">()</span>  <span class="c1">// 判断类型是否可比较
+</span><span class="c1"></span>        <span class="o">...</span>
+        <span class="c1">// 类型不可比较时返回
+</span><span class="c1"></span>        <span class="c1">// 每个类型都有一个flags属性，该属性包含了Noalg判断是否可以比较
+</span><span class="c1"></span>        <span class="c1">// slice在初始化的时候会SetNoalg(true)
+</span><span class="c1"></span>        <span class="c1">// map在创建hmap时会SetNoalg(true)
+</span><span class="c1"></span>        <span class="c1">// func在创建匿名函数也会SetNoalg(true)
+</span><span class="c1"></span>        <span class="k">if</span> <span class="nx">t</span><span class="p">.</span><span class="nf">Noalg</span><span class="p">()</span> <span class="p">{</span>
+		      <span class="k">return</span> <span class="nx">ANOEQ</span><span class="p">,</span> <span class="nx">t</span>
+	      <span class="p">}</span>
 
-func typecheck1() // 检查类型
-  func IncomparableField() // 返回结构体不可比较的字段，如果有的话
-    func IsComparable()  // 判断字段的类型是否可以比较
-      func algtype1()  // 判断类型是否可比较
-        ...
-        // 类型不可比较时返回
-        // 每个类型都有一个flags属性，该属性包含了Noalg判断是否可以比较
-        // slice在初始化的时候会SetNoalg(true)
-        // map在创建hmap时会SetNoalg(true)
-        // func在创建匿名函数也会SetNoalg(true)
-        if t.Noalg() {
-		      return ANOEQ, t
-	      }
-
-        // 以防万一下面还会有一次判断
-        switch t.Etype {
-          // func和map
-          case TFUNC, TMAP:
-		        return ANOEQ, t
-  a        // slice
-          case TSLICE:
-		        return ANOEQ, t
-        }
+        <span class="c1">// 以防万一下面还会有一次判断
+</span><span class="c1"></span>        <span class="k">switch</span> <span class="nx">t</span><span class="p">.</span><span class="nx">Etype</span> <span class="p">{</span>
+          <span class="c1">// func和map
+</span><span class="c1"></span>          <span class="k">case</span> <span class="nx">TFUNC</span><span class="p">,</span> <span class="nx">TMAP</span><span class="p">:</span>
+		        <span class="k">return</span> <span class="nx">ANOEQ</span><span class="p">,</span> <span class="nx">t</span>
+          <span class="c1">// slice
+</span><span class="c1"></span>          <span class="k">case</span> <span class="nx">TSLICE</span><span class="p">:</span>
+		        <span class="k">return</span> <span class="nx">ANOEQ</span><span class="p">,</span> <span class="nx">t</span>
+        <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>同理我们平时比较的时候，也不能用以上3种去比较</p>
@@ -280,5 +278,5 @@ func typecheck1() // 检查类型
             </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
                 <i class="fas fa-comment fa-fw"></i>
             </a>
-        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":10},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+        </div><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":100},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
 </html>

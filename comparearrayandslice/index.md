@@ -40,10 +40,11 @@ fmt.Println(a==b)
 ```
 以上代码编译时会报错：`invalid operation: a == b (struct containing map[int]int cannot be compared)`
 
-可以到源码里找到相应的代码
-```
-/cmd/compile/internal/gc/typecheck.go
+<br>
 
+可以到源码里找到相应的代码
+`/cmd/compile/internal/gc/typecheck.go`
+```golang
 func typecheck1() // 检查类型
   func IncomparableField() // 返回结构体不可比较的字段，如果有的话
     func IsComparable()  // 判断字段的类型是否可以比较
@@ -63,7 +64,7 @@ func typecheck1() // 检查类型
           // func和map
           case TFUNC, TMAP:
 		        return ANOEQ, t
-  a        // slice
+          // slice
           case TSLICE:
 		        return ANOEQ, t
         }

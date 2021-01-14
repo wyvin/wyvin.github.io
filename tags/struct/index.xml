@@ -9,6 +9,6 @@
     <pubDate>Wed, 13 Jan 2021 14:55:05 &#43;0800</pubDate>
     <author>Author</author>
     <guid>http://example.org/comparearrayandslice/</guid>
-    <description><![CDATA[struct可以比较，但有一些条件需要注意 相同类型 必须是相同类型的struct 1 2 3 4 5 6 7 8 9 10 11 12 type A struct { Num int } type B struct { Num int } a := A{} b :=]]></description>
+    <description><![CDATA[golang中的struct可不可以比较呢]]></description>
 </item></channel>
 </rss>

@@ -139,13 +139,28 @@ shell> mysqladmin -u root -p shutdown
 shell> mysql --verbose --help | grep my.cnf
 ```
 
-增加配置：
+增加源配置：
 ```shell
 [mysqld]
-log-bin=mysql-bin  # 启用二进制日志文件
-server-id=1        # 设置服务唯一id，副本服务器为2
+log-bin=mysql-bin  # 启用二进制日志文件 必须
+server-id=1        # 设置服务唯一id
 gtid_mode=ON       # 启用基于GTID的复制
 enforce-gtid-consistency=ON  # 启用GTID模式
+```
+
+副本的配置如下：
+```shell
+[mysqld]
+server-id=2
+gtid_mode=ON
+enforce-gtid-consistency=ON
+
+# 启用日志（可选）
+# 启用日志可以在binlog中查找gtid和对应的语句
+# 不启用则需要在mysql.gtid_executed表中查找gtid，然后到源上查找对应到语句
+# binlog与gtid_executed只生效其中一个
+log-bin=mysql-bin
+log-slave-updates=ON
 ```
 启动数据库
 

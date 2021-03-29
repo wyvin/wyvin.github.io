@@ -3,7 +3,14 @@
         <title>mysql - Tag - wyvin&#39;s blog</title>
         <link>http://example.org/tags/mysql/</link>
         <description>mysql - Tag - wyvin&#39;s blog</description>
-        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 19 Jan 2021 14:00:00 &#43;0800</lastBuildDate><atom:link href="http://example.org/tags/mysql/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 29 Mar 2021 17:00:00 &#43;0800</lastBuildDate><atom:link href="http://example.org/tags/mysql/" rel="self" type="application/rss+xml" /><item>
+    <title>优化GroupBy语句</title>
+    <link>http://example.org/optimizegroupby/</link>
+    <pubDate>Mon, 29 Mar 2021 17:00:00 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>http://example.org/optimizegroupby/</guid>
+    <description><![CDATA[优化groupby语句性能]]></description>
+</item><item>
     <title>部署mysql（GTID主从复制）</title>
     <link>http://example.org/deploymysql/</link>
     <pubDate>Tue, 19 Jan 2021 14:00:00 &#43;0800</pubDate>
